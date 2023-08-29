@@ -94,10 +94,9 @@ class AuthTokenManager(models.Manager):
         else:
             expiry = timezone.now() + client.token_ttl
 
-        instance = super(AuthTokenManager, self).create(
+        return super(AuthTokenManager, self).create(
             token=token, user=user, client=client, expiry=expiry
         )
-        return instance
 
 
 class AuthToken(models.Model):
