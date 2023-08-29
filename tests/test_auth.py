@@ -22,7 +22,7 @@ class AuthTestCase(CustomTestCase):
         # authenticate client
         self.token_instance = AuthToken.objects.create(self.user, self.authclient)
         self.client.credentials(
-            HTTP_AUTHORIZATION=("Token %s" % self.token_instance.token)
+            HTTP_AUTHORIZATION=f"Token {self.token_instance.token}"
         )
         # reset queries
         reset_queries()
@@ -53,9 +53,7 @@ class AuthTestCase(CustomTestCase):
         self.assertEqual(Client.objects.count(), 1)
         rf = APIRequestFactory()
         request = rf.get("/")
-        request.META = {
-            "HTTP_AUTHORIZATION": "Token {}".format(self.token_instance.token)
-        }
+        request.META = {"HTTP_AUTHORIZATION": f"Token {self.token_instance.token}"}
         (auth_user, auth_token) = auth.TokenAuthentication().authenticate(request)
         self.assertEqual(
             self.token_instance.token,

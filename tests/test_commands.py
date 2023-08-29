@@ -22,7 +22,7 @@ class ClientCommandTestCase(TestCase):
 
         out = self.call_command(client_name)
 
-        self.assertEqual(out, "Client {} created!\n".format(client_name))
+        self.assertEqual(out, f"Client {client_name} created!\n")
         self.assertEqual(Client.objects.count(), 1)
 
     def test__create_client__valid_data(self):
@@ -33,7 +33,7 @@ class ClientCommandTestCase(TestCase):
 
         out = self.call_command(client_name, token_ttl=ttl, throttle_rate=throttle_rate)
 
-        self.assertEqual(out, "Client {} created!\n".format(client_name))
+        self.assertEqual(out, f"Client {client_name} created!\n")
         self.assertEqual(Client.objects.count(), 1)
 
     def test__create_client__name_not_set_raises_exc(self):

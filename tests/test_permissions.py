@@ -24,25 +24,25 @@ class PermissionsTestCase(CustomTestCase):
         )
 
     def test_onlywebclient_view_200(self):
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % self.token1.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token1.token}")
         resp = self.client.get(onlywebclient_url)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_onlywebclient_view_403(self):
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % self.token2.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token2.token}")
         resp = self.client.get(onlywebclient_url)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_nowebclient_view_403(self):
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % self.token1.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token1.token}")
         resp = self.client.get(nowebclient_url)
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_nowebclient_view_200(self):
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % self.token2.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token2.token}")
         resp = self.client.get(nowebclient_url)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)

@@ -5,6 +5,7 @@ Per API client token authentication Module for django rest framework.
 
 ## Docs & Example Usage: https://github.com/eshaan7/django-rest-durin
 """
+
 import os
 
 from setuptools import find_packages, setup
@@ -50,18 +51,16 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     keywords="django rest authentication login token client auth",
-    packages=find_packages(exclude=[".github", "docs", "tests", "example_project"]),
+    packages=find_packages(
+        exclude=[".github", "docs", "tests", "example_project"]
+    ),
     install_requires=["django>=2.2", "djangorestframework>=3.7.0", "humanize"],
     project_urls={
         "Documentation": "https://django-rest-durin.readthedocs.io/",
         "Funding": "https://www.paypal.me/eshaanbansal",
         "Source": GITHUB_URL,
-        "Tracker": "{}/issues".format(GITHUB_URL),
+        "Tracker": f"{GITHUB_URL}/issues",
     },
-    # List additional groups of dependencies here (e.g. development
-    # dependencies). You can install these using the following syntax,
-    # for example:
-    # $ pip install -e .[dev,test]
     extras_require={
         "dev": [
             "black==20.8b1",

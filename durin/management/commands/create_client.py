@@ -43,7 +43,7 @@ class Command(BaseCommand):
         if client.is_valid():
             client.save()
             self.stdout.write(
-                self.style.SUCCESS("Client {} created!".format(client.data.get("name")))
+                self.style.SUCCESS(f'Client {client.data.get("name")} created!')
             )
             return
         raise CommandError(

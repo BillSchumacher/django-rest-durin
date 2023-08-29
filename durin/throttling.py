@@ -80,8 +80,7 @@ class UserClientRateThrottle(UserRateThrottle):  # lgtm [py/missing-call-to-init
         """
         user_pk = request._auth.user_id
         client_pk = request._auth.client_id
-        ident = "user-{0}.client-{1}".format(user_pk, client_pk)
-        return ident
+        return "user-{0}.client-{1}".format(user_pk, client_pk)
 
     @staticmethod
     def validate_client_throttle_rate(rate):

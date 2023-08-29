@@ -63,14 +63,14 @@ class ViewsTestCase(CustomTestCase):
         instance = AuthToken.objects.create(
             self.user, self.authclient, delta_ttl=timedelta(seconds=0)
         )
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         response = self.client.get(root_url)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {"detail": "The given token has expired."})
 
     def test_invalid_token_length_returns_401_code(self):
         invalid_token = "1" * (durin_settings.TOKEN_CHARACTER_LENGTH - 1)
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % invalid_token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {invalid_token}")
         response = self.client.get(root_url)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {"detail": "Invalid token."})
@@ -78,8 +78,8 @@ class ViewsTestCase(CustomTestCase):
     def test_invalid_odd_length_token_returns_401_code(self):
         self.assertEqual(Client.objects.count(), 1)
         instance = AuthToken.objects.create(self.user, self.authclient)
-        odd_length_token = instance.token + "1"
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % odd_length_token))
+        odd_length_token = f"{instance.token}1"
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {odd_length_token}")
         response = self.client.get(root_url)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {"detail": "Invalid token."})
@@ -95,16 +95,16 @@ class ViewsTestCase(CustomTestCase):
         instance = AuthToken.objects.create(
             user=self.user, client=self.authclient, delta_ttl=timedelta(seconds=0)
         )
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         self.client.get(root_url)
 
         self.assertTrue(self.signal_was_called)
 
     def test_invalid_auth_prefix_return_401(self):
         instance = AuthToken.objects.create(user=self.user, client=self.authclient)
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         ok_response = self.client.get(root_url)
-        self.client.credentials(HTTP_AUTHORIZATION=("Baerer %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Baerer {instance.token}")
         failed_response = self.client.get(root_url)
         self.assertEqual(ok_response.status_code, 200)
         self.assertEqual(failed_response.status_code, 401)
@@ -114,7 +114,7 @@ class ViewsTestCase(CustomTestCase):
         self.client.credentials(HTTP_AUTHORIZATION=("Token"))
         resp1 = self.client.get(root_url)
         self.assertEqual(resp1.status_code, 401)
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s typo" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token} typo")
         resp2 = self.client.get(root_url)
         self.assertEqual(resp2.status_code, 401)
 
@@ -201,7 +201,7 @@ class AuthViewsTestCase(CustomTestCase):
         AuthToken.objects.create(user=self.user2, client=self.authclient)
         self.assertEqual(AuthToken.objects.count(), 2)
 
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         self.client.post(logout_url)
         self.assertEqual(
             AuthToken.objects.count(), 1, "other tokens should remain after logout"
@@ -214,7 +214,7 @@ class AuthViewsTestCase(CustomTestCase):
             token = AuthToken.objects.create(user=self.user, client=c)
         self.assertEqual(AuthToken.objects.count(), len(self.client_names))
 
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         self.client.post(logoutall_url, {}, format="json")
         self.assertEqual(AuthToken.objects.count(), 0)
 
@@ -227,7 +227,7 @@ class AuthViewsTestCase(CustomTestCase):
         # 2 x len(self.client_names) tokens were created
         self.assertEqual(AuthToken.objects.count(), 2 * len(self.client_names))
 
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         self.client.post(logoutall_url, {}, format="json")
         # now half of the tokens (for user #1) should have been deleted
         self.assertEqual(
@@ -301,7 +301,7 @@ class AuthViewsTestCase(CustomTestCase):
         self.assertEqual(AuthToken.objects.count(), 0)
         instance = AuthToken.objects.create(user=self.user, client=self.authclient)
         self.assertEqual(AuthToken.objects.count(), 1)
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         resp = self.client.post(refresh_url, {}, format="json")
         self.assertEqual(
             AuthToken.objects.count(), 1, "refresh view should not create new token."
@@ -318,7 +318,7 @@ class SessionAndAPIAccessViewsTestCase(CustomTestCase):
         super(SessionAndAPIAccessViewsTestCase, self).setUp()
         # setup token and api client
         self.token = self._create_authtoken()
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % self.token.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.token}")
         # setup apiaccess client
         self.apiaccess_client, _ = Client.objects.get_or_create(
             name=new_settings["API_ACCESS_CLIENT_NAME"]
@@ -533,7 +533,7 @@ class ExampleProjectViewsTestCase(CustomTestCase):
         instance = AuthToken.objects.create(
             self.user, self.authclient, delta_ttl=timedelta(seconds=1)
         )
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
         resp1 = self.client.get(cached_auth_url)
         self.assertEqual(resp1.status_code, 200)
         time.sleep(3)
@@ -551,7 +551,7 @@ class ExampleProjectViewsTestCase(CustomTestCase):
         """
         self.assertEqual(AuthToken.objects.count(), 0)
         instance = AuthToken.objects.create(self.user, self.authclient)
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
 
         resp1 = self.client.get(throttled_view_url)
         self.assertEqual(resp1.status_code, 200)
@@ -576,7 +576,7 @@ class ExampleProjectViewsTestCase(CustomTestCase):
         instance = AuthToken.objects.create(self.user, testauthclient)
         self.assertEqual(AuthToken.objects.count(), 1)
 
-        self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % instance.token))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {instance.token}")
 
         for _ in range(THROTTLE_NUM_REQUESTS):
             resp = self.client.get(throttled_view_url)

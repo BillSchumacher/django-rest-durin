@@ -145,8 +145,7 @@ class RefreshView(APIView):
         """
         How to renew the token instance.
         """
-        new_expiry = token.renew_token(request=request)
-        return new_expiry
+        return token.renew_token(request=request)
 
     def post(self, request, *args, **kwargs):
         auth_token = request._auth
@@ -230,8 +229,7 @@ class TokenSessionsViewSet(
         """
         if instance.pk == self.request.auth.pk:
             raise ValidationError(
-                "Can't delete token if the request is authed with it."
-                "Use {} instead.".format(reverse("durin_logout"))
+                f"""Can't delete token if the request is authed with it.Use {reverse("durin_logout")} instead."""
             )
         instance.delete()
 
@@ -247,13 +245,12 @@ class APIAccessTokenView(APIView):
 
     @property
     def client_name(self) -> str:
-        client_name = getattr(durin_settings, "API_ACCESS_CLIENT_NAME", None)
-        # verify/ asssert
-        if not client_name:
+        if client_name := getattr(durin_settings, "API_ACCESS_CLIENT_NAME", None):
+            return client_name
+        else:
             raise AssertionError(
                 "setting `API_ACCESS_CLIENT_NAME` must be set to use this."
             )
-        return client_name
 
     def get_serializer(self, *args, **kwargs):
         return APIAccessTokenSerializer(
